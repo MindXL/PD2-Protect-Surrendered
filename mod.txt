@@ -1,0 +1,31 @@
+{
+	"name": "Protect Surrendered",
+	"description": "Prevents all damage to surrendered/intimidated enemies and civilians in loud mode. Bullets pass through surrendered units.",
+	"author": "Mind",
+	"contact": "",
+	"version": "1.0",
+	"pre_hooks": [
+		{
+			"hook_id": "lib/entry",
+			"script_path": "hooks/init.lua"
+		}
+	],
+	"hooks": [
+		{
+			"hook_id": "lib/units/enemies/cop/copdamage",
+			"script_path": "hooks/cop_damage.lua"
+		},
+		{
+			"hook_id": "lib/units/civilians/civiliandamage",
+			"script_path": "hooks/civilian_damage.lua"
+		},
+		{
+			"hook_id": "lib/units/enemies/cop/logics/coplogicintimidated",
+			"script_path": "hooks/cop_logic_intimidated.lua"
+		},
+		{
+			"hook_id": "lib/managers/group_ai_states/groupaistatebase",
+			"script_path": "hooks/group_ai_state.lua"
+		}
+	]
+}
