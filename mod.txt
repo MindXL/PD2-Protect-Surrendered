@@ -3,7 +3,7 @@
 	"description": "Prevents all damage to surrendered/intimidated enemies and civilians in loud mode. Bullets pass through surrendered units.",
 	"author": "Mind",
 	"contact": "",
-	"version": "1.0",
+	"version": "1.1",
 	"pre_hooks": [
 		{
 			"hook_id": "lib/entry",
