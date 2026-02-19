@@ -56,6 +56,20 @@ function ProtectSurrendered.is_protected(unit)
 	return false
 end
 
+-- Wraps a damage method on `class` so that calls on protected units are
+-- silently dropped. All wrapped damage functions share the same signature
+-- (self, attack_data), which is verified by the game source for every
+-- CopDamage / CivilianDamage damage_* method.
+function ProtectSurrendered.wrap_damage(class, method_name)
+	local original = class[method_name]
+	class[method_name] = function(self, attack_data)
+		if ProtectSurrendered.is_protected(self._unit) then
+			return
+		end
+		return original(self, attack_data)
+	end
+end
+
 -- Called when the game transitions from stealth to loud.
 -- Moves all currently surrendered units to Slot 22 so bullets pass through.
 function ProtectSurrendered._update_surrendered_slots()
