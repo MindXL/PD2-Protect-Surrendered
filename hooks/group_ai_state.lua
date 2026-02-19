@@ -6,6 +6,7 @@
 Hooks:PostHook(GroupAIStateBase, "init", "ProtectSurrendered_GroupAIInit", function(self)
 	self:add_listener("ProtectSurrendered_whisper", { "whisper_mode" }, function(enabled)
 		if not enabled then
+			ProtectSurrendered._log("Whisper mode off -> updating surrendered slots")
 			ProtectSurrendered._update_surrendered_slots()
 		end
 	end)

@@ -5,6 +5,88 @@
 
 ProtectSurrendered = ProtectSurrendered or {}
 
+ProtectSurrendered._save_path = (SavePath or "") .. "protect_surrendered_settings.json"
+ProtectSurrendered._settings = ProtectSurrendered._settings or {
+	debug = false,
+}
+
+local _LOG_PREFIX = "[ProtectSurrendered] "
+
+-- Sends a local system-chat message when chat APIs are available.
+-- Safe no-op if chat is unavailable in the current game/menu state.
+function ProtectSurrendered._chat(msg)
+	local chat_manager = managers and managers.chat
+	if not chat_manager or not chat_manager._receive_message then
+		return
+	end
+
+	local channel_id = (ChatManager and ChatManager.GAME) or 1
+	local color = (tweak_data and tweak_data.system_chat_color) or nil
+	chat_manager:_receive_message(channel_id, "ProtectSurrendered", msg, color)
+end
+
+-- Emits debug output only when the runtime debug toggle is enabled.
+function ProtectSurrendered._log(msg)
+	if ProtectSurrendered._settings.debug == true then
+		ProtectSurrendered._announce(msg)
+	end
+end
+
+-- Broadcast helper used by debug/status flows:
+-- writes to BLT log and mirrors to local chat for quick visibility.
+function ProtectSurrendered._announce(msg)
+	log(_LOG_PREFIX .. msg)
+	ProtectSurrendered._chat(msg)
+end
+
+-- Returns a stable, human-readable unit label for diagnostics.
+-- Prefers tweak table names and falls back to unit:name().
+function ProtectSurrendered._unit_id(unit)
+	if not alive(unit) then
+		return "<dead>"
+	end
+	local base = unit:base()
+	local tweak = base and base._tweak_table
+	return tweak or tostring(unit:name())
+end
+
+function ProtectSurrendered.load_settings()
+	local file = io.open(ProtectSurrendered._save_path, "r")
+	if file then
+		local raw = file:read("*all")
+		file:close()
+
+		if raw and raw ~= "" then
+			local ok, data = pcall(json.decode, raw)
+			if ok and type(data) == "table" then
+				ProtectSurrendered._settings.debug = data.debug == true
+			end
+		end
+	end
+end
+
+function ProtectSurrendered.save_settings()
+	local file = io.open(ProtectSurrendered._save_path, "w+")
+	if not file then
+		return
+	end
+	file:write(json.encode(ProtectSurrendered._settings))
+	file:close()
+end
+
+function ProtectSurrendered.set_debug(enabled, announce)
+	local value = enabled == true
+	ProtectSurrendered._settings.debug = value
+	ProtectSurrendered.save_settings()
+
+	if announce then
+		local state = value and "enabled" or "disabled"
+		ProtectSurrendered._announce("DEBUG " .. state .. " via menu")
+	end
+end
+
+ProtectSurrendered.load_settings()
+
 -- Returns true if the unit should be immune to all damage:
 --   - Must be alive
 --   - Game must NOT be in stealth (whisper) mode
@@ -64,6 +146,7 @@ function ProtectSurrendered.wrap_damage(class, method_name)
 	local original = class[method_name]
 	class[method_name] = function(self, attack_data)
 		if ProtectSurrendered.is_protected(self._unit) then
+			ProtectSurrendered._log("Blocked " .. method_name .. " on " .. ProtectSurrendered._unit_id(self._unit))
 			return
 		end
 		return original(self, attack_data)
@@ -87,6 +170,7 @@ function ProtectSurrendered._update_surrendered_slots()
 			if brain.surrendered and brain:surrendered() then
 				local is_converted = brain._logic_data and brain._logic_data.is_converted
 				if not is_converted then
+					ProtectSurrendered._log("Slot -> 22 (stealth transition): " .. ProtectSurrendered._unit_id(unit))
 					unit:base():set_slot(unit, 22)
 				end
 			end
@@ -100,6 +184,7 @@ function ProtectSurrendered._update_surrendered_slots()
 		local brain = alive(unit) and unit.brain and unit:brain()
 		if brain then
 			if brain.is_current_logic and brain:is_current_logic("surrender") then
+				ProtectSurrendered._log("Slot -> 22 (stealth transition): " .. ProtectSurrendered._unit_id(unit))
 				unit:base():set_slot(unit, 22)
 			end
 		end

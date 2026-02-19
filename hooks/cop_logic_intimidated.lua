@@ -7,6 +7,7 @@ Hooks:PostHook(CopLogicIntimidated, "enter", "ProtectSurrendered_IntimidatedEnte
 	local groupai = managers and managers.groupai
 	local group_state = groupai and groupai:state()
 	if group_state and not group_state:whisper_mode() and alive(data.unit) then
+		ProtectSurrendered._log("Slot -> 22 (intimidated enter): " .. ProtectSurrendered._unit_id(data.unit))
 		data.unit:base():set_slot(data.unit, 22)
 	end
 end)

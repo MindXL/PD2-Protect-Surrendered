@@ -30,6 +30,10 @@
 		{
 			"hook_id": "lib/network/handlers/unitnetworkhandler",
 			"script_path": "hooks/unit_network_handler.lua"
+		},
+		{
+			"hook_id": "lib/managers/menumanager",
+			"script_path": "hooks/menu_options.lua"
 		}
 	]
 }
