@@ -15,8 +15,14 @@ function ProtectSurrendered.is_protected(unit)
 		return false
 	end
 
+	local groupai = managers and managers.groupai
+	local group_state = groupai and groupai:state()
+	if not group_state then
+		return false
+	end
+
 	-- In stealth, surrendered hostages / enemies remain vulnerable
-	if managers.groupai:state():whisper_mode() then
+	if group_state:whisper_mode() then
 		return false
 	end
 
@@ -53,11 +59,17 @@ end
 -- Called when the game transitions from stealth to loud.
 -- Moves all currently surrendered units to Slot 22 so bullets pass through.
 function ProtectSurrendered._update_surrendered_slots()
+	local enemy_manager = managers and managers.enemy
+	if not enemy_manager then
+		return
+	end
+
 	-- Update surrendered enemies (cops)
-	for _, u_data in pairs(managers.enemy:all_enemies()) do
+	local enemies = enemy_manager:all_enemies() or {}
+	for _, u_data in pairs(enemies) do
 		local unit = u_data.unit
-		if alive(unit) and unit.brain and unit:brain() then
-			local brain = unit:brain()
+		local brain = alive(unit) and unit.brain and unit:brain()
+		if brain then
 			if brain.surrendered and brain:surrendered() then
 				local is_converted = brain._logic_data and brain._logic_data.is_converted
 				if not is_converted then
@@ -68,10 +80,11 @@ function ProtectSurrendered._update_surrendered_slots()
 	end
 
 	-- Update surrendered civilians
-	for _, u_data in pairs(managers.enemy:all_civilians()) do
+	local civilians = enemy_manager:all_civilians() or {}
+	for _, u_data in pairs(civilians) do
 		local unit = u_data.unit
-		if alive(unit) and unit.brain and unit:brain() then
-			local brain = unit:brain()
+		local brain = alive(unit) and unit.brain and unit:brain()
+		if brain then
 			if brain.is_current_logic and brain:is_current_logic("surrender") then
 				unit:base():set_slot(unit, 22)
 			end

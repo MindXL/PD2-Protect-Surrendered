@@ -4,7 +4,9 @@
 -- restores Slot 12 when the unit leaves the intimidated state.
 
 Hooks:PostHook(CopLogicIntimidated, "enter", "ProtectSurrendered_IntimidatedEnter", function(data, new_logic_name, enter_params)
-	if not managers.groupai:state():whisper_mode() and alive(data.unit) then
+	local groupai = managers and managers.groupai
+	local group_state = groupai and groupai:state()
+	if group_state and not group_state:whisper_mode() and alive(data.unit) then
 		data.unit:base():set_slot(data.unit, 22)
 	end
 end)
