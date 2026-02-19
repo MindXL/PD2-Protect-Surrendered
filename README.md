@@ -16,26 +16,6 @@ A PAYDAY 2 mod that makes surrendered (intimidated) enemies and civilians immune
 
 - [SuperBLT](https://superblt.znix.xyz/) (or compatible BLT mod loader)
 
-## Installation
-
-1. Download or clone this repository.
-2. Copy the `ProtectSurrendered` folder into your PAYDAY 2 `mods/` directory.
-3. Launch the game. SuperBLT will load the mod automatically.
-
-```
-PAYDAY 2/
-  mods/
-    ProtectSurrendered/
-      mod.txt
-      hooks/
-        init.lua
-        cop_damage.lua
-        civilian_damage.lua
-        cop_logic_intimidated.lua
-        group_ai_state.lua
-        unit_network_handler.lua
-```
-
 ## Multiplayer Behavior
 
 ### Recommended: all players install the mod
