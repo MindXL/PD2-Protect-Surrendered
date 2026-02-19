@@ -9,7 +9,28 @@
 -- catches the animation path.
 
 local _original_action_hurt_start = UnitNetworkHandler.action_hurt_start
+local function _is_authoritative_peer()
+	-- Network handlers should only block on the authoritative side (host/server).
+	-- In singleplayer, session may be nil; treat that as authoritative so behavior
+	-- remains unchanged outside multiplayer sessions.
+	if Network and Network.is_server and Network:is_server() then
+		return true
+	end
+
+	local network_manager = managers and managers.network
+	local session = network_manager and network_manager:session()
+	if session and session.is_host then
+		return session:is_host()
+	end
+
+	return session == nil
+end
+
 local function _should_block_network_damage(unit)
+	if not _is_authoritative_peer() then
+		return false
+	end
+
 	-- character_damage() guard avoids touching non-combat units accidentally.
 	return alive(unit) and unit:character_damage() and ProtectSurrendered.is_protected(unit)
 end

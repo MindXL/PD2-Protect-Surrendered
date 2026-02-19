@@ -29,4 +29,12 @@ If only the **host** has the mod installed:
 - **Host** — Fully protected. Surrendered units cannot be damaged or killed by anyone. The authoritative game state (health, alive/dead, mission objectives) is always correct.
 - **Other players** — They may see surrendered units take damage or die on their own screens. This is a visual desync only; the host's game state remains correct, so missions will not fail due to "killed" hostages, and surrendered units will continue to function.
 
+### Client-only installation (non-host)
+
+If only a **client** (non-host) has the mod installed:
+
+- **Network damage blocking is host-authoritative** — The `UnitNetworkHandler` protection path only blocks on the host/singleplayer authority side.
+- **Why this is intentional** — This avoids client-side network blocking that can create stuck "ghost" units (visible to one player but not interactable or meaningful to the lobby).
+- **Practical result** — You may still see host-authoritative outcomes (including surrendered targets dying) when the host does not run the mod.
+
 This is a fundamental limitation of PAYDAY 2's peer-to-peer networking — see [TECHNICAL.md](TECHNICAL.md) for a full explanation.
