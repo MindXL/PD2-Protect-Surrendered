@@ -26,6 +26,10 @@
 		{
 			"hook_id": "lib/managers/group_ai_states/groupaistatebase",
 			"script_path": "hooks/group_ai_state.lua"
+		},
+		{
+			"hook_id": "lib/network/handlers/unitnetworkhandler",
+			"script_path": "hooks/unit_network_handler.lua"
 		}
 	]
 }
