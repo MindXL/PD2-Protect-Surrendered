@@ -161,32 +161,27 @@ function ProtectSurrendered._update_surrendered_slots()
 		return
 	end
 
-	-- Update surrendered enemies (cops)
-	local enemies = enemy_manager:all_enemies() or {}
-	for _, u_data in pairs(enemies) do
-		local unit = u_data.unit
-		local brain = alive(unit) and unit.brain and unit:brain()
-		if brain then
-			if brain.surrendered and brain:surrendered() then
-				local is_converted = brain._logic_data and brain._logic_data.is_converted
-				if not is_converted then
-					ProtectSurrendered._log("Slot -> 22 (stealth transition): " .. ProtectSurrendered._unit_id(unit))
-					unit:base():set_slot(unit, 22)
-				end
-			end
-		end
-	end
-
-	-- Update surrendered civilians
-	local civilians = enemy_manager:all_civilians() or {}
-	for _, u_data in pairs(civilians) do
-		local unit = u_data.unit
-		local brain = alive(unit) and unit.brain and unit:brain()
-		if brain then
-			if brain.is_current_logic and brain:is_current_logic("surrender") then
+	local function _apply_slot_to_units(units, should_update)
+		for _, u_data in pairs(units) do
+			local unit = u_data.unit
+			local brain = alive(unit) and unit.brain and unit:brain()
+			if brain and should_update(brain) then
 				ProtectSurrendered._log("Slot -> 22 (stealth transition): " .. ProtectSurrendered._unit_id(unit))
 				unit:base():set_slot(unit, 22)
 			end
 		end
 	end
+
+	-- Update surrendered enemies (cops)
+	_apply_slot_to_units(enemy_manager:all_enemies() or {}, function(brain)
+		if not (brain.surrendered and brain:surrendered()) then
+			return false
+		end
+		return not (brain._logic_data and brain._logic_data.is_converted)
+	end)
+
+	-- Update surrendered civilians
+	_apply_slot_to_units(enemy_manager:all_civilians() or {}, function(brain)
+		return brain.is_current_logic and brain:is_current_logic("surrender")
+	end)
 end
