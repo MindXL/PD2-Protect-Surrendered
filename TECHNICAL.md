@@ -45,6 +45,8 @@ When the game transitions from stealth to loud, a `whisper_mode` event listener 
 
 The mod uses a `pre_hook` on `lib/entry` to load `hooks/init.lua` before any other game scripts. This ensures the global `ProtectSurrendered` table and all shared functions (`is_protected`, `_update_surrendered_slots`) are available regardless of which hook fires first, avoiding load-order issues.
 
+`ProtectSurrendered.wrap_damage(class, method_name)` also validates that the target method exists before wrapping. This keeps compatibility with game/mod variants where a method may be absent or overridden unexpectedly.
+
 ## Why Host-Only Installation Causes Visual Desync
 
 PAYDAY 2 uses a **peer-to-peer** networking model built on the Diesel engine. When a player shoots, the game applies damage **locally first** for responsiveness, then broadcasts the result to other peers via `unit:network():send()`.

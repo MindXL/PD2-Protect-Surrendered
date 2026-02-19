@@ -144,6 +144,9 @@ end
 -- CopDamage / CivilianDamage damage_* method.
 function ProtectSurrendered.wrap_damage(class, method_name)
 	local original = class[method_name]
+	if type(original) ~= "function" then
+		return
+	end
 	class[method_name] = function(self, attack_data)
 		if ProtectSurrendered.is_protected(self._unit) then
 			ProtectSurrendered._log("Blocked " .. method_name .. " on " .. ProtectSurrendered._unit_id(self._unit))
