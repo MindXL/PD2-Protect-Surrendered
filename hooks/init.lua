@@ -6,9 +6,11 @@
 ProtectSurrendered = ProtectSurrendered or {}
 
 ProtectSurrendered._save_path = (SavePath or "") .. "protect_surrendered_settings.json"
-ProtectSurrendered._settings = ProtectSurrendered._settings or {
-	debug = false,
-}
+ProtectSurrendered._settings = ProtectSurrendered._settings
+	or {
+		protect_surrendering_enemies = false,
+		debug = false,
+	}
 
 local _LOG_PREFIX = "[ProtectSurrendered] "
 
@@ -59,6 +61,7 @@ function ProtectSurrendered.load_settings()
 		if raw and raw ~= "" then
 			local ok, data = pcall(json.decode, raw)
 			if ok and type(data) == "table" then
+				ProtectSurrendered._settings.protect_surrendering_enemies = data.protect_surrendering_enemies == true
 				ProtectSurrendered._settings.debug = data.debug == true
 			end
 		end
@@ -72,6 +75,17 @@ function ProtectSurrendered.save_settings()
 	end
 	file:write(json.encode(ProtectSurrendered._settings))
 	file:close()
+end
+
+function ProtectSurrendered.set_protect_surrendering_enemies(enabled, announce)
+	local value = enabled == true
+	ProtectSurrendered._settings.protect_surrendering_enemies = value
+	ProtectSurrendered.save_settings()
+
+	if announce then
+		local state = value and "enabled" or "disabled"
+		ProtectSurrendered._announce("Protect surrendering enemies " .. state .. " via menu")
+	end
 end
 
 function ProtectSurrendered.set_debug(enabled, announce)
@@ -120,7 +134,16 @@ function ProtectSurrendered.is_protected(unit)
 
 	-- Cop brain: "intimidated" logic
 	if brain.surrendered and brain:surrendered() then
-		return true
+		if ProtectSurrendered._settings.protect_surrendering_enemies == true then
+			return true
+		end
+
+		-- Strict mode for enemies: only protect fully surrendered (tied) cops.
+		local logic_data = brain._logic_data
+		local internal = logic_data and logic_data.internal_data
+		if internal and internal.tied then
+			return true
+		end
 	end
 
 	-- Civilian brain: "surrender" logic

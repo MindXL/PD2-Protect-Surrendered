@@ -6,7 +6,7 @@ A PAYDAY 2 mod that makes surrendered (intimidated) enemies and civilians immune
 
 - **Full damage immunity** — Surrendered enemies and civilians cannot be harmed by bullets, melee, fire, explosions, or tasers.
 - **Bullet penetration** — Bullets pass through surrendered units instead of stopping on contact, so they won't block your shots at active threats behind them.
-- **Covers the entire surrender sequence** — Protection kicks in as soon as the enemy begins their surrender animation (hands up), not just after they are fully tied.
+- **Enemy protection mode toggle** — By default, only fully surrendered (tied) enemies are protected. You can enable protection for enemies still in the surrender process from the mod menu.
 - **Multiplayer support** — Works in both singleplayer and multiplayer. See [Multiplayer Behavior](#multiplayer-behavior) for details.
 - **Converted cops (Jokers) are unaffected** — Enemies that have been converted to fight for your team still take damage normally, matching vanilla behavior.
 - **Stealth exception** — While the game is in stealth (whisper) mode, surrendered hostages and enemies remain vulnerable as usual.

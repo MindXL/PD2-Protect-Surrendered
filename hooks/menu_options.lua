@@ -5,12 +5,20 @@ Hooks:Add("LocalizationManagerPostInit", "ProtectSurrendered_Localization", func
 	loc:add_localized_strings({
 		protect_surrendered_menu_title = "Protect Surrendered",
 		protect_surrendered_menu_desc = "Options for Protect Surrendered.",
+		protect_surrendered_surrendering_enemies_title = "Protect surrendering enemies",
+		protect_surrendered_surrendering_enemies_desc = "When OFF: only fully surrendered (tied) enemies are protected. Civilians are always protected in surrender logic.",
 		protect_surrendered_debug_title = "Enable debug logs",
 		protect_surrendered_debug_desc = "Show debug logs in BLT log and local chat window.",
 	})
 end)
 
 Hooks:Add("MenuManagerInitialize", "ProtectSurrendered_MenuInit", function(menu_manager)
+	MenuCallbackHandler.ProtectSurrendered_SetProtectSurrenderingEnemies = function(self, item)
+		local value = item:value()
+		local enabled = value == true or value == "on" or value == "true" or value == 1
+		ProtectSurrendered.set_protect_surrendering_enemies(enabled, true)
+	end
+
 	MenuCallbackHandler.ProtectSurrendered_SetDebug = function(self, item)
 		-- BLT toggle values can arrive as booleans, strings, or numbers.
 		local value = item:value()
@@ -24,6 +32,16 @@ Hooks:Add("MenuManagerSetupCustomMenus", "ProtectSurrendered_SetupMenu", functio
 end)
 
 Hooks:Add("MenuManagerPopulateCustomMenus", "ProtectSurrendered_PopulateMenu", function(menu_manager, nodes)
+	MenuHelper:AddToggle({
+		id = "protect_surrendered_surrendering_enemies_toggle",
+		title = "protect_surrendered_surrendering_enemies_title",
+		desc = "protect_surrendered_surrendering_enemies_desc",
+		callback = "ProtectSurrendered_SetProtectSurrenderingEnemies",
+		value = ProtectSurrendered._settings.protect_surrendering_enemies == true,
+		menu_id = MENU_ID,
+		priority = 110,
+	})
+
 	MenuHelper:AddToggle({
 		id = "protect_surrendered_debug_toggle",
 		title = "protect_surrendered_debug_title",

@@ -8,7 +8,10 @@ A unit is protected when **all** of the following are true:
 
 - The game is **not** in stealth (whisper) mode.
 - The unit is **not** a converted cop (Joker).
-- The unit is in the `"intimidated"` brain logic (cops), the `"surrender"` brain logic (civilians), **or** is playing a surrender animation (`surrender`, `hands_up`, `hands_back`, `hands_tied`).
+- For enemies (cops): the unit is in `"intimidated"` logic **and** either:
+  - `protect_surrendering_enemies` is enabled, or
+  - the cop is fully surrendered (`internal_data.tied`).
+- For civilians: the unit is in `"surrender"` brain logic (always protected in this logic state, regardless of enemy toggle).
 
 ## Damage Blocking — Local
 
