@@ -128,13 +128,6 @@ function ProtectSurrendered.is_protected(unit)
 		return true
 	end
 
-	-- Fallback: check animation states that indicate an ongoing surrender sequence
-	-- (hands_up -> hands_back -> hands_tied)
-	local anim = unit.anim_data and unit:anim_data()
-	if anim and (anim.surrender or anim.hands_up or anim.hands_back or anim.hands_tied) then
-		return true
-	end
-
 	return false
 end
 
